@@ -44,7 +44,7 @@ class ecoModel():
 
         return trainingData
 
-    def createModel(trainingData,imgSize):
+    def createDataModel(trainingData,imgSize):
         X = []
         y = []
 
@@ -56,7 +56,7 @@ class ecoModel():
 
         return [X,y]
 
-    def saveModel(X,y):
+    def saveDataModel(X,y):
         pickle_out = open("X.pickle","wb")
         pickle.dump(X, pickle_out)
         pickle_out.close()
@@ -67,7 +67,7 @@ class ecoModel():
 
         return True
 
-    def loadModel():
+    def loadDataModel():
         pickle_in = open("X.pickle","rb")
         X = pickle.load(pickle_in)
 
@@ -106,4 +106,10 @@ class ecoModel():
 
         model.fit(X, y, batch_size=32, epochs=10, validation_split=0.3, callbacks=[tensorboard])
 
-        model.save(str(layerSize) + "x" + str(convLayer) + "CNN.model")
+        model.save(str(layerSize) + "x" + str(convLayer) + "-CNN.model")
+
+    def useCNN(imgSize, filePath, model, catagories):
+        imgArray = cv2.imread(filePath, cv2.IMREAD_GRAYSCALE)
+        newArray = cv2.resize(imgArray, (imgSize, imgSize))
+        prediction = model.predict([new_array.reshape(-1, imgSize, imgSize, 1)])
+        return catagories[int(prediction[0][0])])

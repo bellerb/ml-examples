@@ -8,8 +8,8 @@ IMG_SIZE = 70
 
 #trainingData = ecoModel.createTrainingData(DATADIR,CATEGORIES,IMG_SIZE)
 #modelData = ecoModel.createModel(trainingData,IMG_SIZE)
-#ecoModel.saveModel(modelData[0],modelData[1])
-modelData = ecoModel.loadModel()
+#ecoModel.saveDataModel(modelData[0],modelData[1])
+modelData = ecoModel.loadDataModel()
 
 dense_layers = [0]
 layer_sizes = [64]
@@ -21,3 +21,6 @@ for denseLayer in dense_layers:
             name = "{}-conv-{}-nodes-{}-dense-{}".format(convLayer, layerSize, denseLayer, int(time.time()))
             print(name)
             ecoModel.trainCNN(name,modelData[0],modelData[1],layerSize,convLayer,denseLayer)
+
+model = tf.keras.models.load_model("64x2CNN.model")
+ecoModel.useCNN(IMG_SIZE,'doggo.jpg',model,CATEGORIES):
