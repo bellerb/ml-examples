@@ -50,17 +50,50 @@ data = {'target':np.array(data['target'][10:]),'context':np.array(data['context'
 test = {'target':np.array(data['target'][:10]),'context':np.array(data['context'][:10])}
 
 #Build model
-name = log.modelName(locations['main'],'skipGram','FFNN2D') #Name of model
+name = 'SKIP-GRAM_example'
 layers = [{'Size':100,'Activation':'relu'},
           {'Size':75,'Activation':'relu'},
           {'Size':len(word_bank),'Activation':'softmax'}]
 #Build model --------------------------------->
-model = networks.FFNN2D(data['target'].shape[1:],layers)
+model = Sequential()
+model.add(Flatten()) #Must flatten layer if going from 2D to 1D (dense)
+model.add(Dense(layers[0]['Size'],input_shape=data['context'].shape[1:]))
+model.add(Activation(layers[0]['Activation']))
+for l in layers[1:]:
+    model.add(Dropout(0.5))
+    model.add(Dense(l['Size']))
+    model.add(Activation(l['Activation']))
 #Train model --------------------------------->
-train = learn.supervised_train(data['target'],data['context'],model,location,name,loss='categorical_crossentropy')
+model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
+model.fit(X,y,epochs=100,validation_split=0.3,callbacks=[tensorboard])
+
 #Save & log new model ------------------------>
-log.logModel(locations['main'],name,layers,'{}-X.pickle'.format(name),'{}-Y.pickle'.format(name),'','',date.strftime('%Y-%m-%d %H:%M:%S'))
-train.save('{}/MRP/ml/models/{}.model'.format(location,name).replace('/','\\'))
+if os.path.exists('{}/logs/models.csv'.format(locations['main'])):
+    data = load.readData('{}/logs/models.csv'.format(locations['main']))
+else:
+    data = pd.DataFrame()
+info = name.split('-')
+type = info[0]
+purpose = info[1]
+id = info[2]
+end = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+result = {
+            'ID':id,
+            'Name':name,
+            'Purpose':purpose,
+            'Type':type,
+            'Dx':'{}-X.pickle'.format(name),
+            'Dy':'{}-Y.pickle'.format(name),
+            'Std':'',
+            'Mean':'',
+            'Start':date.strftime('%Y-%m-%d %H:%M:%S'),
+            'End':end,
+            'Status':True
+         }
+data = data.append(result,ignore_index=True)
+data.to_csv('{}/logs/models.csv'.format(location),index=False)
+
+model.save('{}/ml/models/{}.model'.format(location,name).replace('/','\\'))
 
 
 '''
