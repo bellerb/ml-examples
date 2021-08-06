@@ -1,3 +1,7 @@
+import numpy as np
+import random
+from copy import deepcopy
+
 #Evaluation function
 def check_state(board):
     for x in range(3):
