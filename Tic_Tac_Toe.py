@@ -1,5 +1,6 @@
-import numpy as np
+#MINIMAX algorithm implementation to play perfect tic tac toe
 import random
+import numpy as np
 from copy import deepcopy
 
 #Evaluation function
